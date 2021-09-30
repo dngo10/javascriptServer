@@ -1,0 +1,15 @@
+{
+  "name": "myapp4",
+  "version": "1.0.0",
+  "description": "Koa server app",
+  "main": "main.js",
+  "scripts": {
+    "test": "node --inspect main.js"
+  },
+  "author": "Dao Ngo",
+  "license": "ISC",
+  "dependencies": {
+    "koa": "^2.13.3",
+    "sqlite3": "^5.0.2"
+  }
+}
