@@ -7,6 +7,7 @@ export class App{
 
     constructor(){
         this.#record.CreateTable(this.#sqlCtrl.db);
+        this.#record.DropTable(this.#sqlCtrl.db);
         //this.#sqlCtrl.db;
         this.#sqlCtrl.db.close();
     }

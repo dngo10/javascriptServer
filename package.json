@@ -4,6 +4,7 @@
   "description": "Express server app",
   "main": "main.js",
   "scripts": {
+    "debug": "node --inspect main.js",
     "test": "node --inspect main.js"
   },
   "author": "Dao Ngo",

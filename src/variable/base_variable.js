@@ -28,6 +28,7 @@ export class BaseVar{
         }else{
             newVal = new BaseVar(this.name, this.#value);
         }
+        return newVal;
     }
 
     getEqualQuestion(){
@@ -50,6 +51,11 @@ export class BaseVar{
     }
 
     set value(value){
+        if (typeof value === 'string' ||
+            typeof value === 'boolean' ||
+            typeof value === 'number' ||
+            Object.prototype.toString.call(value) === '[object Date]'
+        )
         this.#value = value;
     }
     

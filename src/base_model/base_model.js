@@ -146,7 +146,8 @@ export class BaseModel{
      * @param {sqlite3.Database} db
      */
     DropTable(db){
-        db.exec(this.#deleteTableCommand(), (err)=>{
+        let strCmmd = this.#deleteTableCommand();
+        db.exec(strCmmd, (err)=>{
             if(err) throw err?.message;
         });
         return true;
