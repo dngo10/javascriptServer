@@ -1,18 +1,20 @@
-import { Database } from 'sqlite3';
+import sqlite3 from 'sqlite3';
 
 export class SqliteController{
-    #sqlite3 = require('sqlite3').verbose();
+    #sqlite3 = sqlite3.verbose();
+
     /**
-     * @type {Database}
+     * @type {sqlite3.Database}
      */
     #db;
 
 
     constructor(){
-        this.#db = new this.#sqlite3.Database(':memory');
+        this.#db = new this.#sqlite3.Database('../record.db', function(err){
+            if(err) throw `ERROR: ${err.message}`;
+        });
     }
 
-    get sqlite(){return this.#sqlite3;}
     get db(){return this.#db;}
 }
 

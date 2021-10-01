@@ -1,15 +1,19 @@
 {
   "name": "myapp4",
   "version": "1.0.0",
-  "description": "Koa server app",
+  "description": "Express server app",
   "main": "main.js",
   "scripts": {
     "test": "node --inspect main.js"
   },
   "author": "Dao Ngo",
-  "license": "ISC",
+  "license": "For Commercial",
   "dependencies": {
-    "koa": "^2.13.3",
     "sqlite3": "^5.0.2"
-  }
+  },
+  "compilerOptions":{
+    "module": "commonjs",
+    "target": "es6"
+  },
+  "type" : "module"
 }

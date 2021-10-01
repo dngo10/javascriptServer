@@ -1,4 +1,6 @@
-class BaseVar{
+import {Kw} from "../ultility/sqlite3_keywords.js";
+
+export class BaseVar{
     #name;
     #value;
     #type;
@@ -16,6 +18,16 @@ class BaseVar{
         this.#value = value;
         this.#contraint = constraint;
         this.#type = this.#detectType();
+    }
+
+    copy(){
+        let newVal;
+        if((Object.prototype.toString.call(this.#value) === '[object Date]')){
+            let temp = new Date(this.#value);
+            newVal = new BaseVar(this.name, temp);
+        }else{
+            newVal = new BaseVar(this.name, this.#value);
+        }
     }
 
     getEqualQuestion(){

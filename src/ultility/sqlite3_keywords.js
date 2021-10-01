@@ -1,4 +1,4 @@
-class Kw{
+export class Kw{
     static #keywords = new Set([
         "ABORT",
         "ACTION",
@@ -150,12 +150,13 @@ class Kw{
     ]);
 
     static notNull ="NOT NULL";
-    static primaryKey = `PRIMARY KEY ${Kw.notNull} AUTOINCREMENT`;
+    //static primaryKey = `PRIMARY KEY ${Kw.notNull} AUTOINCREMENT`;
     static unique = "UNIQUE";
     static inter = "INTEGER";
     static real = "REAL";
     static txt = "TEXT";
     static numeric = "NUMERIC";
+    static autoInc = "AUTOINCREMENT";
 
     /**
      * @param {string} value

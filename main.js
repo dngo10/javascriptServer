@@ -1,9 +1,20 @@
+import express from 'express';
+import { App } from './src/app.js';
 
-const Koa =  require('koa');
-const app = new Koa();
+export class Main{
+    #app =express();
+    #port = 3000;
+    #mainApp = new App();
 
-app.use(ctx => {
-    ctx.body = 'Hello Koa';
-});
+    constructor(){
+        this.#app.get('/', (req, res) =>{
+            res.send('Hello World');
+        });
 
-app.listen(3000);
+        this.#app.listen(this.#port, ()=>{
+            console.log(`listening at http://localhost:${this.#port}`);
+        })
+    }
+}
+
+const main = new Main();
