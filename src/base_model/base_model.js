@@ -73,7 +73,9 @@ export class BaseModel{
     InsertRow(db){
         let result = false;
         let newId = -1;
-        db.run(this.#insertCommand(this.GetListNoId()), this.GetListNoId().map(e =>e.value), function (err){
+        let commandStr = this.#insertCommand(this.GetListNoId());
+        let paras = this.GetListNoId().map(e =>e.value);
+        db.run(commandStr, paras, function (err){
             if(err) throw  err.message;
             newId = this.lastID;
         });
@@ -178,7 +180,7 @@ export class BaseModel{
      * @param {BaseVar} comparedVar
      */
     #updateRowCommand(vals, comparedVar) {
-        return `UPDATE ${this.#tableName} SET ${this.#createUpdateEqualString(vals)} WHERE ${comparedVar.getEqualQuestion()}`;
+        return `UPDATE ${this.#tableName} SET ${this.#createUpdateEqualString(this.GetListNoId())} WHERE ${comparedVar.getEqualQuestion()}`;
     }
 
     /**
@@ -186,7 +188,7 @@ export class BaseModel{
      */
     #insertCommand(vals) {
         if (vals.length == 0) return "";
-        return `INSERT INTO ${this.tableName} (${this.#getInsertValue(vals)}) VALUES ?`;
+        return `INSERT INTO ${this.tableName} (${this.#getInsertValue(vals)}) VALUES (${this.#getInsertQuestion(vals)})`;
     }
 
     /**
@@ -261,7 +263,7 @@ export class BaseModel{
      */
     #getInsertQuestion(vals) {
         let str = "";
-        return vals.map(val => val.name).join(' , ');
+        return vals.map(val => ' ? ').join(' , ');
     }
     /* #endregion */
 }

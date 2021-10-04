@@ -8,13 +8,18 @@
     "test": "node --inspect main.js"
   },
   "author": "Dao Ngo",
-  "license": "For Commercial",
+  "license": "UNLICENSED",
   "dependencies": {
-    "sqlite3": "^5.0.2"
+    "sqlite3": "^5.0.2",
+    "uuid": "^8.3.2"
   },
-  "compilerOptions":{
-    "module": "commonjs",
+  "compilerOptions": {
+    "module": "es6",
     "target": "es6"
   },
-  "type" : "module"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dngo10/javascriptServer.git"
+  },
+  "type": "module"
 }
