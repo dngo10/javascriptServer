@@ -4,7 +4,7 @@ import {BaseVar} from "./variable/base_variable.js";
 import { v4 as uuidv4 } from 'uuid';
 
 export class RecordTable extends BaseModel{
-    #dataString = new BaseVar("data_string", "", Kw.notNull);
+    #dataString = new BaseVar("data_string", "",);
     #uuid = new BaseVar("UUID", uuidv4());
 
     get uuid(){return this.#uuid}
@@ -27,18 +27,15 @@ export class RecordTable extends BaseModel{
         }
     }
 
-    varList = [this.id, this.uuid, this.dataString];
-    varListNoId =[this.uuid, this.dataString];
+    /**
+     * @override
+     */
+    GetList(){return [this.id, this.uuid, this.dataString];}
 
     /**
      * @override
      */
-    GetList(){return this.varList;}
-
-    /**
-     * @override
-     */
-    GetListNoId(){return this.varListNoId;}
+    GetListNoId(){return [this.uuid, this.dataString];}
 
     constructor(){
         super();

@@ -31,8 +31,9 @@ export class BaseVar{
         return newVal;
     }
 
+    //DO NOT QUOTE the ${this.#name}. THE query WILL NOT WORK.
     getEqualQuestion(){
-        return `'${this.#name}' = ? `;
+        return `${this.#name} = ?`;
     }
 
     getCreateString(){
@@ -47,6 +48,8 @@ export class BaseVar{
         let tempName = value.trim().toUpperCase();
         if(!tempName && !Kw.contains(value)){
             this.#name = value.trim().toUpperCase();
+        }else{
+
         }
     }
 

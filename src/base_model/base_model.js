@@ -4,7 +4,7 @@ import sqlite3 from "sqlite3";
 
 
 export class BaseModel{
-    #id = new BaseVar("ID", 0, Kw.notNull);
+    #id = new BaseVar("ID", 0, `${Kw.notNull} ${Kw.unique}`);
     #tableName = "NONAME";
 
     /**
@@ -48,12 +48,11 @@ export class BaseModel{
 
     /**
      * @param {sqlite3.Database} db
-     * @param {BaseVar[]} vals
      */
-    UpdateRow(db, vals){
-        db.run(this.#updateRowCommand(vals, this.#id), vals.map(e => e.value), (err)=>{
-            if(err) throw err.message;
-        })
+    UpdateRow(db){
+        let cmdStr = this.#updateRowCommand(this.id);
+        let paras =[...this.GetListNoId(), this.id].map(e => e.value);
+        db.run(cmdStr, ...paras);
     }
 
     /**
@@ -71,6 +70,7 @@ export class BaseModel{
      * @param {sqlite3.Database} db
      */
     InsertRow(db){
+        let self = this;
         let result = false;
         let newId = -1;
         let commandStr = this.#insertCommand(this.GetListNoId());
@@ -78,12 +78,11 @@ export class BaseModel{
         db.run(commandStr, paras, function (err){
             if(err) throw  err.message;
             newId = this.lastID;
+            self.id.value = newId;
         });
         if(newId != -1){
             result = true;
-            this.#id.value = newId;
         }
-
         return result;
     }
 
@@ -93,9 +92,9 @@ export class BaseModel{
      */
     SelectRows(db, vals){
         let result = [];
-        db.all(this.#selectCommand(vals), vals.map(e =>e.value), (err, rows)=>{
+        db.all(this.#selectCommand(vals), vals.map(e =>e.value), function(err, rows){
             if(err) throw err.message;
-            result = rows;
+            result = [...rows];
         });
         return result;
     }
@@ -105,16 +104,16 @@ export class BaseModel{
      * @param {BaseVar[]} vals
      */
     SelectRow(db, vals){
-        db.all(
+        let self = this;
+        db.get(
             this.#selectCommand(vals), 
             vals.map(e =>e.value), 
-            (err, rows)=>{
+            function(err, row){
                 if(err) throw err.message;
-                rows.forEach(row =>{
-                    this.#updateObject(this.GetList(), row);
-                })
+                self.#updateObject(self.GetList(), row);
+                
             }
-        )
+        );
     }
 
     /**
@@ -128,6 +127,7 @@ export class BaseModel{
                (err, rows)=>{
                     if(err) throw err.message;
                     else if(rows.length) result = true;
+                    return result;
                 }
             );
         return result;
@@ -138,8 +138,8 @@ export class BaseModel{
      */
     CreateTable(db){
         let comStr = this.#createTableCommand(this.GetList());
-        db.exec(comStr, (err)=>{
-            if(err) {throw err?.message}
+        db.run(comStr, function(err){
+            if(err) throw `Damn this bug: ${err?.message}`;
         });
         return true;
     }
@@ -163,6 +163,8 @@ export class BaseModel{
         vals.forEach(val => {
             val.value = row[val.name];
         });
+
+        let t = this.GetList();
     }
 
 
@@ -171,16 +173,15 @@ export class BaseModel{
      * @param {BaseVar} comparedVal
      */
     #deleteRowCommand(comparedVal) {
-        return `DELETE FROM ${this.#tableName} WHERE ${comparedVal.getEqualQuestion()}`;
+        return `DELETE FROM ${this.#tableName} WHERE ${comparedVal.getEqualQuestion()} ;`;
     }
 
 
     /**
-     * @param {BaseVar[]} vals
      * @param {BaseVar} comparedVar
      */
-    #updateRowCommand(vals, comparedVar) {
-        return `UPDATE ${this.#tableName} SET ${this.#createUpdateEqualString(this.GetListNoId())} WHERE ${comparedVar.getEqualQuestion()}`;
+    #updateRowCommand(comparedVar) {
+        return `UPDATE ${this.#tableName} SET ${this.#createUpdateEqualString(this.GetListNoId())} WHERE ${comparedVar.getEqualQuestion()};`;
     }
 
     /**
@@ -188,7 +189,7 @@ export class BaseModel{
      */
     #insertCommand(vals) {
         if (vals.length == 0) return "";
-        return `INSERT INTO ${this.tableName} (${this.#getInsertValue(vals)}) VALUES (${this.#getInsertQuestion(vals)})`;
+        return `INSERT INTO ${this.tableName} (${this.#getInsertValue(vals)}) VALUES (${this.#getInsertQuestion(vals)});`;
     }
 
     /**
@@ -196,7 +197,8 @@ export class BaseModel{
      */
     #selectCommand(vals){
         if(vals.length == 0) return "";
-        return `SELECT * FROM ${this.tableName} WHERE ${this.#createEqualString(vals)}`;
+        let cmndStr = `SELECT * FROM ${this.tableName} WHERE ${this.#createEqualString(vals)};`;
+        return cmndStr;
     }
 
     /**
@@ -204,11 +206,11 @@ export class BaseModel{
      */
     #createTableCommand(vals) {
         let creaStr = this.#createTableVals(vals);
-        return `CREATE TABLE IF NOT EXISTS ${this.tableName}(${creaStr})`;
+        return `CREATE TABLE IF NOT EXISTS ${this.tableName}(${creaStr});`;
     }
 
     #deleteTableCommand() {
-        return `DROP TABLE IF EXISTS ${this.tableName}`;
+        return `DROP TABLE IF EXISTS ${this.tableName};`;
     }
     /* #endregion */
 
@@ -237,7 +239,7 @@ export class BaseModel{
         }).map(val => val.getForeignKey()).join(' , ');
 
         if (foreignRef.length != 0) {
-            return stringFinal + primaryKey + " , " + foreignRef;
+            return stringFinal + primaryKey + ' , ' + foreignRef;
         } else {
             return stringFinal + primaryKey;
         }
@@ -258,7 +260,6 @@ export class BaseModel{
     }
 
     /**
-     * WRONG HERE, DONT NEED IT
      * @param {BaseVar[]} vals
      */
     #getInsertQuestion(vals) {

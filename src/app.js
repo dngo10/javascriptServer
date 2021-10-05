@@ -7,14 +7,37 @@ export class App{
     #record = new RecordTable();
     #sqlCtrl = new SqliteController();
 
-    constructor(){
-        this.#record.CreateTable(this.#sqlCtrl.db);
-        this.#record.dataString.value = "update 1";
-        //this.#record.InsertRow(this.#sqlCtrl.db);
+    get sqlCtrl(){return this.#sqlCtrl;}
 
-        //this.#record.DropTable(this.#sqlCtrl.db);
-        //this.#sqlCtrl.db;
+    constructor(){
+        this.#record.DropTable(this.#sqlCtrl.db);
+        this.#record.CreateTable(this.#sqlCtrl.db);
         this.#sqlCtrl.db.close();
+    }
+
+    Temp(){
+        this.#sqlCtrl = new SqliteController();
+        this.#record.dataString.value = "update 0";
+        this.#record.InsertRow(this.#sqlCtrl.db);
+        this.#sqlCtrl.db.close();
+    }
+
+    Temp2(){
+        this.#sqlCtrl = new SqliteController();
+        this.#record.dataString.value = "update 2";
+        this.#record.uuid.value = "not here, I changed it.";
+
+        this.#record.UpdateRow(this.#sqlCtrl.db);
+        this.#sqlCtrl.db.close();
+    }
+
+    Temp3(){
+        this.#sqlCtrl = new SqliteController();
+        let tableTemp = new RecordTable();
+        tableTemp.id.value = this.#record.id.value;
+        tableTemp.SelectRow(this.#sqlCtrl.db, [tableTemp.id]);
+        this.#sqlCtrl.db.close();       
+        console.log(tableTemp.uuid.value);
     }
 
     /**
@@ -39,6 +62,6 @@ export class App{
      * @param {sqlite3.Database} db
      */
     UpdateRecord(db){
-        this.#record.UpdateRow(db, [this.#record.uuid]);
+        this.#record.UpdateRow(db);
     }
 }

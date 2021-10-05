@@ -14,7 +14,7 @@
     "uuid": "^8.3.2"
   },
   "compilerOptions": {
-    "module": "es6",
+    "module": "commonjs",
     "target": "es6"
   },
   "repository": {
