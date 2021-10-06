@@ -48,8 +48,9 @@ export class BaseModel{
 
     /**
      * @param {sqlite3.Database} db
+     * @param {Function} [callback]
      */
-    UpdateRow(db){
+    UpdateRow(db, callback = undefined){
         let cmdStr = this.#updateRowCommand(this.id);
         let paras =[...this.GetListNoId(), this.id].map(e => e.value);
         db.run(cmdStr, ...paras);
@@ -58,27 +59,32 @@ export class BaseModel{
     /**
      * @param {sqlite3.Database} db
      * @param {BaseVar} val
-     */
-    DeleteRow(db, val){
+     * @callback callback
+     * */
+    DeleteRow(db, val, callback = (/** @type {string} */ message)=>{console.log(`${message}`)}){
         db.exec(this.#deleteRowCommand(val), (err)=>{
-            if(err) throw err.message;
+            let message = "";
+            if(err){
+                message = err.message;
+                callback(message);
+                throw err.message;
+            }
         });
         return true;
     }
 
     /**
      * @param {sqlite3.Database} db
+     * @callback callback
      */
-    InsertRow(db){
-        let self = this;
+    InsertRow(db, callback = null){
         let result = false;
         let newId = -1;
         let commandStr = this.#insertCommand(this.GetListNoId());
         let paras = this.GetListNoId().map(e =>e.value);
         db.run(commandStr, paras, function (err){
             if(err) throw  err.message;
-            newId = this.lastID;
-            self.id.value = newId;
+            callback?(this.lastID)
         });
         if(newId != -1){
             result = true;
@@ -119,15 +125,15 @@ export class BaseModel{
     /**
      * @param {sqlite3.Database} db
      * @param {BaseVar[]} vals
+     * @param {function(any[]):void} [callback]
      */
-    HasRow(db, vals){
+    HasRow(db, vals, callback = undefined){
         let result = false;
         db.all(this.#getInsertValue(vals),
                vals.map(e => e.value),
                (err, rows)=>{
                     if(err) throw err.message;
-                    else if(rows.length) result = true;
-                    return result;
+                    callback??(rows);
                 }
             );
         return result;
@@ -135,22 +141,26 @@ export class BaseModel{
 
     /**
      * @param {sqlite3.Database} db
+     * @param {function(Error):void} [callback]
      */
-    CreateTable(db){
+    CreateTable(db, callback = undefined){
         let comStr = this.#createTableCommand(this.GetList());
         db.run(comStr, function(err){
             if(err) throw `Damn this bug: ${err?.message}`;
+            callback??(err);
         });
         return true;
     }
 
     /**
      * @param {sqlite3.Database} db
+     * @param {function(Error):void} [callback]
      */
-    DropTable(db){
+    DropTable(db, callback = undefined){
         let strCmmd = this.#deleteTableCommand();
         db.exec(strCmmd, (err)=>{
             if(err) throw err?.message;
+            callback??(err);
         });
         return true;
     }
