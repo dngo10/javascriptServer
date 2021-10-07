@@ -14,7 +14,7 @@ export class SqliteController{
             if(err) throw `ERROR: FILE NOT FOUND`;
         });
 
-        this.#db.run( 'PRAGMA journal_mode = WAL;' );
+        this.#db.run('PRAGMA journal_mode = WAL;');
         this.#db.run('PRAGMA foreign_keys = ON;');
     }
 

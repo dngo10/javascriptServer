@@ -8,11 +8,30 @@ export class App{
     #sqlCtrl = new SqliteController();
 
     get sqlCtrl(){return this.#sqlCtrl;}
+    get record() {return this.#record;}
+
+    getRecord(){return this.record;}
+    getSqlCtrl() {return this.#sqlCtrl;}
 
     constructor(){
-        this.#record.DropTable(this.#sqlCtrl.db);
-        this.#record.CreateTable(this.#sqlCtrl.db);
+
+        this.getRecord = this.getRecord.bind(this);
+        this.getSqlCtrl = this.getSqlCtrl.bind(this);
+
+        this.#record.DropTable(this.#sqlCtrl.db, this.DropCallBack);
+        //this.#record.CreateTable(this.#sqlCtrl.db);
         this.#sqlCtrl.db.close();
+    }
+
+    /**
+     * @param {Error} [err]
+     * @param {function():void} [callback]
+     */
+
+    DropCallBack(err = undefined, callback = () => {this.getRecord().CreateTable(this.getSqlCtrl().db);}){
+        callback();
+        if(!err) return true;
+        return false;
     }
 
     Temp(){
